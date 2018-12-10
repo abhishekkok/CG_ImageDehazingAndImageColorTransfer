@@ -38,7 +38,7 @@ class ImageGraphSegmentation {
 public:
 	ImageGraphSegmentation();
 
-	void applySegmentation(cv::Mat &image, int c, int min_size);
+	void applySegmentation(cv::Mat &image, int c, int min_size, cv::Mat &darkChannelImage);
 
 private:
 	void recolor(cv::Mat &image, DisjointSet &forest);

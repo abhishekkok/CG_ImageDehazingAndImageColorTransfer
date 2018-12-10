@@ -1,29 +1,44 @@
 #include "SegmentationBasedImageDehazing.h"
 #include "ImageDehazing.h"
 
-void SegmentationBasedImageDehazing::performImageSegmentationBasedDehazing(string fileName)
-{
-	#include "ImageDehazing.h"
+void SegmentationBasedImageDehazing::performSegmentationBasedDehazing(string fileName, int minimiumEdge)
+{	
 	Mat img = imread(fileName);
-	Mat darkChannelImage = imread(fileName);
+	Mat darkChannelImage = imread(fileName); // read orignal and  convert it to darkchannel
 	ImageGraphSegmentation egbs = ImageGraphSegmentation();
-	egbs.applySegmentation(darkChannelImage, 5, 30);//10,20
+	egbs.applySegmentation(img, 5, minimiumEdge, darkChannelImage);//10,20
+
+	string segmentedImage = "segmentedImage.jpg";
+	string segmentedDarkChannel = "segmentedDarkChannel.jpg";
+	string finalImage = "segmentationDehazerFileResult.jpg";
+
+	imwrite(segmentedImage, img);
+	imwrite(segmentedDarkChannel, darkChannelImage);
+	//write segmented images to file 
+
+	ImageDehazing dehazer ; //use standard dehazer code on the segmented Image
+	dehazer.loadImage(segmentedImage);
+	dehazer.dehazeImageWithSegmentation(darkChannelImage,fileName);
+	dehazer.writeImage(finalImage);
 	
+	display(fileName, segmentedDarkChannel , segmentedImage ,finalImage);
+}
+
+void SegmentationBasedImageDehazing::display(string fileName , string segmentationDarkChannel,string segmentedImage, string finalImage) {
+
 	namedWindow("orignalImage", WINDOW_KEEPRATIO);
-	imshow("orignalImage", img);
+	imshow("orignalImage", imread(fileName));
 
-	namedWindow("darkChannelImage", WINDOW_KEEPRATIO);
-	imshow("darkChannelImage", darkChannelImage);
+	namedWindow("segmentedDarkChannelImage", WINDOW_KEEPRATIO);
+	imshow("segmentedDarkChannelImage", imread(segmentationDarkChannel));
 
-	ImageDehazing dehazer ;
-	dehazer.dehazeImageWithSegmentation(darkChannelImage,img);
-	dehazer.writeImage("segmentationDehazerFileResult.jpg");
-	Mat result = imread("segmentationDehazerFileResult.jpg");
+	namedWindow("segmentedImage", WINDOW_KEEPRATIO);
+	imshow("segmentedImage", imread(segmentedImage));
+
 	namedWindow("finalImage", WINDOW_KEEPRATIO);
-	imshow("finalImage", result);
-	
+	imshow("finalImage", imread(finalImage));
+
 	waitKey(0);
-	destroyWindow("orignalImage");
-	destroyWindow("darkChannelImage");
-	destroyWindow("finalImage");
+	destroyAllWindows();
+
 }

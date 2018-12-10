@@ -5,7 +5,7 @@ ImageGraphSegmentation::ImageGraphSegmentation() {
 
 }
 
-void ImageGraphSegmentation::applySegmentation(cv::Mat &image, int c, int min_size) {
+void ImageGraphSegmentation::applySegmentation(cv::Mat &image, int c, int min_size , cv::Mat &darkChannel) {
 	int height = image.rows;
 	int width = image.cols;
 
@@ -25,9 +25,8 @@ void ImageGraphSegmentation::applySegmentation(cv::Mat &image, int c, int min_si
 			forest.merge(a, b);
 		}
 	}
-
-	//recolor(image, forest);
-	darkChannelUsingDisjointSet(image, forest);
+	recolor(image, forest);
+	darkChannelUsingDisjointSet(darkChannel, forest);
 }
 
 void ImageGraphSegmentation::recolor(cv::Mat &image, DisjointSet &forest) {

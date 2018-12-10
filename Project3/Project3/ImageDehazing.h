@@ -17,7 +17,7 @@ public:
 	void loadImage(const std::string& _filename);
 	uchar getFinalValforIndividualChannel(double t, int channelIndex, int row, int col);
 	bool dehazeImage(const int& _patchsize, const double& _t, const double& _w);
-	cv::Mat dehazeImageWithSegmentation(cv::Mat darkChannelviaSegmentation , cv::Mat orignalImage);
+	cv::Mat dehazeImageWithSegmentation(cv::Mat darkChannelviaSegmentation , const std::string& _fileName);
 	bool writeImage(const std::string filename);
 	void generateDarkChannelImage(const int& _patchsize);
 	unsigned char getMinimumOfRGBforPatch(const int& _patchsize, int matRows, int matCols, int row, int col);

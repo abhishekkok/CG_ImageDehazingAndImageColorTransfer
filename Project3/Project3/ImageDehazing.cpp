@@ -7,8 +7,6 @@ using namespace cv;
 void ImageDehazing::loadImage(const std::string& _filename) {
 
 	matImage = imread(_filename, IMREAD_COLOR); // read image in BGR way 
-	matImage.convertTo(matDoubleImage, CV_64FC3); //convert Image to double of byte64 with 3 channels
-	//not using matDoubleImage in our case
 }
 
 
@@ -19,17 +17,9 @@ bool ImageDehazing::writeImage(string filename) {
 }
 
 
-/*
-void ImageDehazing::ShowImg(Mat image)
-{
-	imshow("Image", image);
-	while (waitKey(10) != 27);
-}
-*/
 void ImageDehazing::generateDarkChannelImage(const int& _patchsize)
 {
 	darkChannelMatImage.create(matImage.rows, matImage.cols, CV_8UC1); //creating the empty image to fill out
-
 	for (int i = 0; i < matImage.rows; ++i) {
 		for (int j = 0; j < matImage.cols; ++j) {
 			unsigned char DarkVal = 255;
@@ -37,7 +27,7 @@ void ImageDehazing::generateDarkChannelImage(const int& _patchsize)
 			darkChannelMatImage.at<uchar>(i, j) = DarkVal;
 		}
 	}
-	imwrite("dark.jpg", darkChannelMatImage);
+	imwrite("patchBasedDarkChannel.jpg", darkChannelMatImage);
 }
 
 unsigned char ImageDehazing::getMinimumOfRGBforPatch(const int& _patchsize, int matRows, int matCols, int row, int col)
@@ -50,7 +40,7 @@ unsigned char ImageDehazing::getMinimumOfRGBforPatch(const int& _patchsize, int 
 			unsigned char color1 = matImage.at<Vec3b>(m, n)[0];
 			unsigned char color2 = matImage.at<Vec3b>(m, n)[1];
 			unsigned char color3 = matImage.at<Vec3b>(m, n)[2];
-			darkVal = std::min(std::min(color1, color2), color3);
+			darkVal = std::min(darkVal,std::min(std::min(color1, color2), color3));
 		}
 	}
 
@@ -96,19 +86,20 @@ double ImageDehazing::atmosphericLightEstimater()
 void ImageDehazing::addTransmissionMedium(const int& _patchsize, const double& _t, const double& _w)
 {
 	matRecoveredImage.create(matImage.rows, matImage.cols, CV_8UC3); //create Empty image
-	cout << " t Outside " << _t << " \n";
+	//cout << " t Outside " << _t << " \n";
 	for (int i = 0; i < matImage.rows;i++)
 	{
 		for (int j = 0; j < matImage.cols; j++)
 		{ 
-			if (darkChannelMatImage.at<uchar>(i, j) == '0')
-				cout << "zero inside " << "\n";
+			//if (darkChannelMatImage.at<uchar>(i, j) == '0')
+				//cout << "zero inside " << "\n";
 			double t = std::max(1 - (_w*darkChannelMatImage.at<uchar>(i, j) / atmosphericLight), _t); // if the value is tooo small take _t as the default...
-			//cout << " t inside " << t << " \n";
+			//cout << t << " ";
 			matRecoveredImage.at<Vec3b>(i, j)[0] = getFinalValforIndividualChannel(t, 0, i, j);
 			matRecoveredImage.at<Vec3b>(i, j)[1] = getFinalValforIndividualChannel(t, 1, i, j);
 			matRecoveredImage.at<Vec3b>(i, j)[2] = getFinalValforIndividualChannel(t, 2, i, j);
 		}
+		//cout <<"\n";
 	}
 
 
@@ -131,14 +122,13 @@ bool ImageDehazing::dehazeImage(const int& _patchSize, const double& _t, const d
 	return true;
 }
 
-cv::Mat ImageDehazing::dehazeImageWithSegmentation(Mat darkChannelviaSegmentation , Mat orignalImage) {
+cv::Mat ImageDehazing::dehazeImageWithSegmentation(Mat darkChannelviaSegmentation, const std::string& orignalfileName) {
 
-	darkChannelMatImage = darkChannelviaSegmentation;
-	matImage = orignalImage;
-	matImage.convertTo(matDoubleImage, CV_64FC3);
+	generateDarkChannelImage(3); //chosing default minimum patch size for segmented Image	
 	atmosphericLight = atmosphericLightEstimater();
-	addTransmissionMedium(0.1,0.1, 0.95);
-	
+	loadImage(orignalfileName); //applying dark channel based estimation on orignal File
+	addTransmissionMedium(3,0.01, 0.95); // fixing weights and t 	
+	cout << "atmospheric Light " << atmosphericLight << " \n";
 	return matRecoveredImage;
 }
 
@@ -154,8 +144,7 @@ void ImageDehazing::display()
 	imshow("FinalOut", matRecoveredImage);
 
 	waitKey(0);
-	destroyWindow("OrignalImage");
-	destroyWindow("DarkChannelImage");
-	destroyWindow("FinalOut");
+	destroyAllWindows();
+	cout << "Destoryed all temp Windows ";
 }
 

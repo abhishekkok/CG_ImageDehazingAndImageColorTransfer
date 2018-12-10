@@ -83,9 +83,7 @@ void ImageConvolution::displayAll(String sourceImage, String targetImage, String
 
 	waitKey(0);
 
-	destroyWindow("sourceImage");
-	destroyWindow("targetImage");
-	destroyWindow("outputImage");
+	destroyAllWindows();
 	cout << "Destoryed all temp Windows ";
 }
 

@@ -8,21 +8,24 @@ using namespace std;
 
 void ImageProcessingService::ImageDehazingTechnique(int index,string fileName)
 {	
-	cout << "Inside with " << index << " with fileName " << fileName <<" \n";
+	cout << "Inside  ImageDehazingTechnique for  " << index << " with fileName " << fileName <<" \n";
 	if (index == 1)
 	{
 		ImageDehazing dehazer;
 		dehazer.loadImage(fileName);
-		dehazer.dehazeImage(0, 0.01, 0.95);
+		dehazer.dehazeImage(3, 0.01, 0.95);
 		dehazer.writeImage("dehazerFileResult.jpg");
 		dehazer.display();
 	}
 	else if (index == 2) {
 		SegmentationBasedImageDehazing temp = SegmentationBasedImageDehazing();
-		temp.performImageSegmentationBasedDehazing(fileName);
+		int minimiumEdge;
+		cout << "Enter minimum edge count for graph segmentation \n";
+		cin >> minimiumEdge;
+		temp.performSegmentationBasedDehazing(fileName, minimiumEdge);
 	}
 
-	cout << "Finished with dehazing " << index << " for fileName " << fileName << " \n";
+	cout << "Finished ImageDehazingTechnique for  " << index << " for fileName " << fileName << " \n";
 	cout << "*********************************************************************** \n";
 
 }
@@ -30,7 +33,7 @@ void ImageProcessingService::ImageDehazingTechnique(int index,string fileName)
 
 void ImageProcessingService::ImageColorTransferTechnique(int index , string sourceFile , string targetFile)
 {
-	cout << " inside with " << index << " with sourceFile " << sourceFile << " and targetFile " << targetFile << " \n";
+	cout << " Performing  ImageColorTransferTechnique with " << index << " with sourceFile " << sourceFile << " and targetFile " << targetFile << " \n";
 	
 	if (index == 1)
 	{
@@ -51,6 +54,6 @@ void ImageProcessingService::ImageColorTransferTechnique(int index , string sour
 		gamutCC.displayAll(sourceFile, targetFile, outputFile, whiteBalanceFile);
 	}
 
-	cout << "Finished with " << index << " for sourceFile " << sourceFile << " and targetFile " << targetFile << " \n";
+	cout << "Finished ImageColorTransferTechnique  " << index << " for sourceFile " << sourceFile << " and targetFile " << targetFile << " \n";
 	cout << "*********************************************************************** \n";
 }
