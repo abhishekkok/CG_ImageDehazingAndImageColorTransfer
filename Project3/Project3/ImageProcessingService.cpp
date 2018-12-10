@@ -13,7 +13,10 @@ void ImageProcessingService::ImageDehazingTechnique(int index,string fileName)
 	{
 		ImageDehazing dehazer;
 		dehazer.loadImage(fileName);
-		dehazer.dehazeImage(3, 0.01, 0.95);
+		int patchSize;
+		cout << "Enter Patch Size for the Dark channel  \n";
+		cin >> patchSize;
+		dehazer.dehazeImage(patchSize, 0.01, 0.95);
 		dehazer.writeImage("dehazerFileResult.jpg");
 		dehazer.display();
 	}
@@ -57,3 +60,4 @@ void ImageProcessingService::ImageColorTransferTechnique(int index , string sour
 	cout << "Finished ImageColorTransferTechnique  " << index << " for sourceFile " << sourceFile << " and targetFile " << targetFile << " \n";
 	cout << "*********************************************************************** \n";
 }
+
